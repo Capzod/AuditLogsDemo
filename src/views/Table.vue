@@ -88,8 +88,8 @@ const fetchLogs = async () => {
       )
     }
 
-    // ✅ Make sure response exists before using it
-    if (!response || !Array.isArray(response.data?.data)) {
+    // 🔒 SAFE CHECK
+    if (!response || !response.data || !Array.isArray(response.data.data)) {
       console.warn("Invalid API structure:", response)
       items.value = []
       totalItems.value = 0
@@ -97,7 +97,8 @@ const fetchLogs = async () => {
     }
 
     items.value = response.data.data
-    totalItems.value = response.data.totalCount ?? response.data.data.length
+    totalItems.value =
+      response.data.totalCount ?? response.data.data.length
 
     console.log("FIRST ROW:", response.data.data[0])
 
@@ -109,6 +110,7 @@ const fetchLogs = async () => {
     loading.value = false
   }
 }
+
 
 
 /* =========================
@@ -180,9 +182,11 @@ onMounted(fetchLogs)
         </template>
 
         <!-- CELLS -->
-        <template v-slot:[`item.createdDateTime`]="{ item }">
-  {{ formatDateTime(item.raw.createdDateTime) }}
+        <template #[`item.createdDateTime`]="{ value }">
+  {{ formatDateTime(value) }}
 </template>
+
+
 
 
         <!-- NO DATA -->
