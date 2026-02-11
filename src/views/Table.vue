@@ -55,10 +55,9 @@ const fetchLogs = async () => {
   loading.value = true
 
   try {
-    let response
+    let response = null
 
     if (hasFilters.value) {
-      // POST FILTER API
       const payload = Object.entries(filters.value)
         .filter(([_, v]) => v && v.trim() !== '')
         .map(([key, value]) => ({
@@ -78,7 +77,6 @@ const fetchLogs = async () => {
         }
       )
     } else {
-      // GET PAGED API
       response = await axios.get(
         `${API_BASE}/api/signin-logs`,
         {
@@ -90,9 +88,9 @@ const fetchLogs = async () => {
       )
     }
 
-    // 🔒 SAFETY CHECK
-    if (!Array.isArray(response.data?.data)) {
-      console.warn('INVALID API RESPONSE', response.data)
+    // ✅ Make sure response exists before using it
+    if (!response || !Array.isArray(response.data?.data)) {
+      console.warn("Invalid API structure:", response)
       items.value = []
       totalItems.value = 0
       return
@@ -101,17 +99,17 @@ const fetchLogs = async () => {
     items.value = response.data.data
     totalItems.value = response.data.totalCount ?? response.data.data.length
 
-    console.log('Rows loaded:', items.value.length)
-    console.log('Total rows:', totalItems.value)
+    console.log("FIRST ROW:", response.data.data[0])
 
   } catch (err) {
-    console.error('API ERROR:', err)
+    console.error("API ERROR:", err)
     items.value = []
     totalItems.value = 0
   } finally {
     loading.value = false
   }
 }
+
 
 /* =========================
    WATCHERS
@@ -182,9 +180,10 @@ onMounted(fetchLogs)
         </template>
 
         <!-- CELLS -->
-        <template #item="{ item }">
-  {{ formatDateTime(item.createdDateTime) }}
+        <template v-slot:[`item.createdDateTime`]="{ item }">
+  {{ formatDateTime(item.raw.createdDateTime) }}
 </template>
+
 
         <!-- NO DATA -->
         <template #no-data>
