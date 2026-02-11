@@ -181,13 +181,11 @@ onMounted(fetchLogs)
           </tr>
         </template>
 
+<!-- for production -->         
         <!-- CELLS -->
         <template #[`item.createdDateTime`]="{ value }">
   {{ formatDateTime(value) }}
 </template>
-
-
-
 
         <!-- NO DATA -->
         <template #no-data>
