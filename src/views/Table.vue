@@ -57,6 +57,9 @@ const fetchLogs = async () => {
   try {
     let response = null
 
+    console.log("PROD FIRST ROW:", items.value[0])
+
+
     if (hasFilters.value) {
       const payload = Object.entries(filters.value)
         .filter(([_, v]) => v && v.trim() !== '')
